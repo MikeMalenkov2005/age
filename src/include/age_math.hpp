@@ -169,14 +169,91 @@ namespace age
 			Matrix2(Vector2<T> c0, Vector2<T> c1) { this->columns[0] = c0; this->columns[1] = c1; }
 			Matrix2(T m00, T m01, T m10, T m11) : Matrix2(Vector2<T>(m00, m01), Vector2<T>(m10, m11)) {}
 			Matrix2() : Matrix2(0, 0, 0, 0) {}
-			__forceinline Vector2<T>& operator[](size_t index) { return this->columns[index]; }
+			__forceinline Vector2<T>& operator[](size_t index) { return index < 2 ? this->columns[index] : NULL; }
 			friend __forceinline Matrix2 transpose(Matrix2 mat) { return Matrix2(mat[0][0], mat[1][0], mat[0][1], mat[1][1]); }
 			__forceinline Matrix2& operator+=(Matrix2 rhs) { this[0] += rhs[0]; this[1] += rhs[1]; return *this; }
-			__forceinline Matrix2& operator+=(T rhs) { this[0] += Vector2<T>(rhs); this[1] += Vector2<T>(rhs); return *this; }
+			__forceinline Matrix2& operator+=(T rhs) { this[0] += rhs; this[1] += rhs; return *this; }
 			__forceinline Matrix2& operator-=(Matrix2 rhs) { this[0] -= rhs[0]; this[1] -= rhs[1]; return *this; }
-			__forceinline Matrix2& operator-=(T rhs) { this[0] -= Vector2<T>(rhs); this[1] -= Vector2<T>(rhs); return *this; }
-			__forceinline Matrix2& operator*=(T rhs) { this[0] *= Vector2<T>(rhs); this[1] *= Vector2<T>(rhs); return *this; }
-			__forceinline Matrix2& operator/=(T rhs) { this[0] /= Vector2<T>(rhs); this[1] /= Vector2<T>(rhs); return *this; }
+			__forceinline Matrix2& operator-=(T rhs) { this[0] -= rhs; this[1] -= rhs; return *this; }
+			__forceinline Matrix2& operator*=(Matrix2 rhs)
+			{
+				Matrix2 lhs_T = transpose(this);
+				this[0][0] = dot(lhs_T[0], rhs[0]);
+				this[0][1] = dot(lhs_T[1], rhs[0]);
+				this[1][0] = dot(lhs_T[0], rhs[1]);
+				this[1][1] = dot(lhs_T[1], rhs[1]);
+				return *this;
+			}
+			__forceinline Matrix2& operator*=(T rhs) { this[0] *= rhs; this[1] *= rhs; return *this; }
+			__forceinline Matrix2& operator/=(T rhs) { this[0] /= rhs; this[1] /= rhs; return *this; }
+			friend __forceinline Matrix2 operator+(Matrix2 lhs, Matrix2 rhs) { return Matrix2(lhs[0] + rhs[0], lhs[1] + rhs[1]); }
+			friend __forceinline Matrix2 operator+(T lhs, Matrix2 rhs) { return Matrix2(lhs + rhs[0], lhs + rhs[1]); }
+			friend __forceinline Matrix2 operator+(Matrix2 lhs, T rhs) { return Matrix2(lhs[0] + rhs, lhs[1] + rhs); }
+			friend __forceinline Matrix2 operator-(Matrix2 lhs, Matrix2 rhs) { return Matrix2(lhs[0] - rhs[0], lhs[1] - rhs[1]); }
+			friend __forceinline Matrix2 operator-(T lhs, Matrix2 rhs) { return Matrix2(lhs - rhs[0], lhs - rhs[1]); }
+			friend __forceinline Matrix2 operator-(Matrix2 lhs, T rhs) { return Matrix2(lhs[0] - rhs, lhs[1] - rhs); }
+			friend __forceinline Matrix2 operator*(Matrix2 lhs, Matrix2 rhs) {
+				Matrix2 lhs_T = transpose(lhs);
+				return Matrix2(
+					dot(lhs_T[0], rhs[0]), dot(lhs_T[1], rhs[0]),
+					dot(lhs_T[0], rhs[1]), dot(lhs_T[1], rhs[1])
+				);
+			}
+			friend __forceinline Matrix2 operator*(T lhs, Matrix2 rhs) { return Matrix2(lhs * rhs[0], lhs * rhs[1]); }
+			friend __forceinline Matrix2 operator*(Matrix2 lhs, T rhs) { return Matrix2(lhs[0] * rhs, lhs[1] * rhs); }
+			friend __forceinline Vector2<T> operator*(Vector2<T> lhs, Matrix2 rhs) { return Vector2<T>(dot(lhs, rhs[0]), dot(lhs, rhs[1])); }
+			friend __forceinline Vector2<T> operator*(Matrix2 lhs, Vector2<T> rhs) { Matrix2 lhs_T = transpose(lhs); return Vector2<T>(dot(lhs_T[0], rhs), dot(lhs_T[1], rhs)); }
+			friend __forceinline Matrix2 operator/(Matrix2 lhs, T rhs) { return Matrix2(lhs[0] / rhs, lhs[1] / rhs); }
+		};
+
+		template<typename T>
+		struct Matrix3
+		{
+			Vector3<T> columns[3];
+			Matrix3(Vector3<T> c0, Vector3<T> c1, Vector3<T> c2) { this->columns[0] = c0; this->columns[1] = c1; this->columns[2] = c2; }
+			Matrix3(T m00, T m01, T m02, T m10, T m11, T m12, T m20, T m21, T m22) : Matrix3(Vector3<T>(m00, m01, m02), Vector3<T>(m10, m11, m12), Vector3<T>(m20, m21, m22)) {}
+			Matrix3() : Matrix3(0, 0, 0, 0, 0, 0, 0, 0, 0) {}
+			__forceinline Vector3<T>& operator[](size_t index) { return index < 3 ? this->columns[index] : NULL; }
+			friend __forceinline Matrix3 transpose(Matrix3 mat) { return Matrix3(mat[0][0], mat[1][0], mat[2][0], mat[0][1], mat[1][1], mat[2][1], mat[0][2], mat[1][2], mat[2][2]); }
+			__forceinline Matrix3& operator+=(Matrix3 rhs) { this[0] += rhs[0]; this[1] += rhs[1]; this[2] += rhs[2]; return *this; }
+			__forceinline Matrix3& operator+=(T rhs) { this[0] += rhs; this[1] += rhs; this[2] += rhs; return *this; }
+			__forceinline Matrix3& operator-=(Matrix3 rhs) { this[0] -= rhs[0]; this[1] -= rhs[1]; this[2] -= rhs[2]; return *this; }
+			__forceinline Matrix3& operator-=(T rhs) { this[0] -= rhs; this[1] -= rhs; this[2] -= rhs; return *this; }
+			__forceinline Matrix3& operator*=(Matrix3 rhs)
+			{
+				Matrix3 lhs_T = transpose(this);
+				this[0][0] = dot(lhs_T[0], rhs[0]);
+				this[0][1] = dot(lhs_T[1], rhs[0]);
+				this[0][2] = dot(lhs_T[2], rhs[0]);
+				this[1][0] = dot(lhs_T[0], rhs[1]);
+				this[1][1] = dot(lhs_T[1], rhs[1]);
+				this[1][2] = dot(lhs_T[2], rhs[1]);
+				this[2][0] = dot(lhs_T[0], rhs[2]);
+				this[2][1] = dot(lhs_T[1], rhs[2]);
+				this[2][2] = dot(lhs_T[2], rhs[2]);
+				return *this;
+			}
+			__forceinline Matrix3& operator*=(T rhs) { this[0] *= Vector3<T>(rhs); this[1] *= Vector3<T>(rhs); this[2] *= Vector3<T>(rhs); return *this; }
+			__forceinline Matrix3& operator/=(T rhs) { this[0] /= Vector3<T>(rhs); this[1] /= Vector3<T>(rhs); this[2] /= Vector3<T>(rhs); return *this; }
+			friend __forceinline Matrix3 operator+(Matrix3 lhs, Matrix3 rhs) { return Matrix3(lhs[0] + rhs[0], lhs[1] + rhs[1], lhs[2] + rhs[2]); }
+			friend __forceinline Matrix3 operator+(T lhs, Matrix3 rhs) { return Matrix3(lhs + rhs[0], lhs + rhs[1], lhs + rhs[2]); }
+			friend __forceinline Matrix3 operator+(Matrix3 lhs, T rhs) { return Matrix3(lhs[0] + rhs, lhs[1] + rhs, lhs[2] + rhs); }
+			friend __forceinline Matrix3 operator-(Matrix3 lhs, Matrix3 rhs) { return Matrix3(lhs[0] - rhs[0], lhs[1] - rhs[1], lhs[2] - rhs[2]); }
+			friend __forceinline Matrix3 operator-(T lhs, Matrix3 rhs) { return Matrix3(lhs - rhs[0], lhs - rhs[1], lhs - rhs[2]); }
+			friend __forceinline Matrix3 operator-(Matrix3 lhs, T rhs) { return Matrix3(lhs[0] - rhs, lhs[1] - rhs, lhs[2] - rhs); }
+			friend __forceinline Matrix3 operator*(Matrix3 lhs, Matrix3 rhs) {
+				Matrix3 lhs_T = transpose(lhs);
+				return Matrix3(
+					dot(lhs_T[0], rhs[0]), dot(lhs_T[1], rhs[0]), dot(lhs_T[2], rhs[0]),
+					dot(lhs_T[0], rhs[1]), dot(lhs_T[1], rhs[1]), dot(lhs_T[2], rhs[1]),
+					dot(lhs_T[0], rhs[2]), dot(lhs_T[1], rhs[2]), dot(lhs_T[2], rhs[2])
+				);
+			}
+			friend __forceinline Matrix3 operator*(T lhs, Matrix3 rhs) { return Matrix3(lhs * rhs[0], lhs * rhs[1], lhs * rhs[2]); }
+			friend __forceinline Matrix3 operator*(Matrix3 lhs, T rhs) { return Matrix3(lhs[0] * rhs, lhs[1] * rhs, lhs[2] * rhs); }
+			friend __forceinline Vector3<T> operator*(Vector3<T> lhs, Matrix3 rhs) { return Vector3<T>(dot(lhs, rhs[0]), dot(lhs, rhs[1]), dot(lhs, rhs[2])); }
+			friend __forceinline Vector3<T> operator*(Matrix3 lhs, Vector3<T> rhs) { Matrix3 lhs_T = transpose(lhs); return Vector3<T>(dot(lhs_T[0], rhs), dot(lhs_T[1], rhs), dot(lhs_T[2], rhs)); }
+			friend __forceinline Matrix3 operator/(Matrix3 lhs, T rhs) { return Matrix3(lhs[0] / rhs, lhs[1] / rhs, lhs[2] / rhs); }
 		};
 	}
 }
