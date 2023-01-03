@@ -67,6 +67,10 @@ namespace age
 			case WM_SYSCHAR:
 				if (window->OnCharPrint != NULL) window->OnCharPrint(wParam, true);
 				break;
+			case WM_QUIT:
+			case WM_DESTROY:
+			case WM_CLOSE:
+				window->OnClose();
 			default:
 				return DefWindowProcA(hWnd, msg, wParam, lParam);
 			}
@@ -89,6 +93,7 @@ namespace age
 				MessageBoxA(NULL, "RegisterClass() failed: Cannot register window class.", "Error", MB_OK);
 				return 1;
 			}
+			return 0;
 		}
 
 		Window::Window(std::string name, int x, int y, int width, int height)
@@ -138,6 +143,7 @@ namespace age
 				current = NULL;
 				wglMakeCurrent(NULL, NULL);
 			}
+			windowMap.erase((HWND)(this->window));
 			ReleaseDC((HWND)(this->window), (HDC)(this->dc));
 			wglDeleteContext((HGLRC)(this->rc));
 			DestroyWindow((HWND)(this->dc));
@@ -188,6 +194,7 @@ namespace age
 
 		void Window::HandleEvents()
 		{
+			if (this->shouldClose) return;
 			MSG msg;
 			while (PeekMessageA(&msg, (HWND)(this->window), 0, 0, PM_NOREMOVE))
 			{
@@ -198,6 +205,16 @@ namespace age
 				}
 				else this->shouldClose = true;
 			}
+		}
+
+		void Window::Close()
+		{
+			CloseWindow((HWND)(this->window));
+		}
+
+		void Window::OnClose()
+		{
+			this->shouldClose = true;
 		}
 
 		bool Window::ShouldClose()

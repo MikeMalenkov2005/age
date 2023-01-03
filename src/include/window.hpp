@@ -24,6 +24,8 @@ namespace age
 			void SetVisible(bool visible);
 			bool IsVisible();
 			void HandleEvents();
+			void Close();
+			void OnClose();
 			bool ShouldClose();
 			GLenum MakeContextCurrent();
 			void (*OnMouseMove)(int x, int y, int mode);
