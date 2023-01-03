@@ -71,9 +71,9 @@ namespace age
 			case WM_DESTROY:
 			case WM_CLOSE:
 				window->OnClose();
-			default:
-				return DefWindowProcA(hWnd, msg, wParam, lParam);
+				break;
 			}
+			return DefWindowProcA(hWnd, msg, wParam, lParam);
 		}
 
 		int Init()
