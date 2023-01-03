@@ -26,6 +26,13 @@ namespace age
 			void HandleEvents();
 			bool ShouldClose();
 			GLenum MakeContextCurrent();
+			void virtual OnMouseMove(int x, int y, int mode);
+			void virtual OnMouseScroll(int x, int y, int scroll, int mode);
+			void virtual OnMouseButtonDown(int x, int y, int button, int mode);
+			void virtual OnMouseButtonUp(int x, int y, int button, int mode);
+			void virtual OnKeyDown(int keyCode, bool alt);
+			void virtual OnKeyUp(int keyCode, bool alt);
+			void virtual OnCharPrint(int charCode, bool alt);
 		};
 	}
 }

@@ -1,6 +1,8 @@
 #include "include/window.hpp"
 
 #include <windows.h>
+#include <windowsx.h>
+#include <map>
 
 #define AGE_WINDOW_CLASS "AgeWindowClass"
 
@@ -8,11 +10,66 @@ namespace age
 {
 	namespace wnd
 	{
+		std::map<HWND, Window*> windowMap;
 		Window* current = NULL;
 
 		LRESULT AgeWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
-			
+			Window* window = windowMap[hWnd];
+			if (window == NULL) return DefWindowProc(hWnd, msg, wParam, lParam);
+			switch (msg)
+			{
+			case WM_MOUSEMOVE:
+				window->OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), GET_KEYSTATE_WPARAM(wParam));
+				break;
+			case WM_MOUSEWHEEL:
+				window->OnMouseScroll(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), GET_WHEEL_DELTA_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
+				break;
+			case WM_LBUTTONDOWN:
+				window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 0, GET_KEYSTATE_WPARAM(wParam));
+				break;
+			case WM_LBUTTONUP:
+				window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 0, GET_KEYSTATE_WPARAM(wParam));
+				break;
+			case WM_RBUTTONDOWN:
+				window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 1, GET_KEYSTATE_WPARAM(wParam));
+				break;
+			case WM_RBUTTONUP:
+				window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 1, GET_KEYSTATE_WPARAM(wParam));
+				break;
+			case WM_MBUTTONDOWN:
+				window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2, GET_KEYSTATE_WPARAM(wParam));
+				break;
+			case WM_MBUTTONUP:
+				window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2, GET_KEYSTATE_WPARAM(wParam));
+				break;
+			case WM_XBUTTONDOWN:
+				window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2 + GET_XBUTTON_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
+				break;
+			case WM_XBUTTONUP:
+				window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2 + GET_XBUTTON_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
+				break;
+			case WM_KEYDOWN:
+				window->OnKeyDown(wParam, false);
+				break;
+			case WM_KEYUP:
+				window->OnKeyUp(wParam, false);
+				break;
+			case WM_CHAR:
+				window->OnCharPrint(wParam, false);
+				break;
+			case WM_SYSKEYDOWN:
+				window->OnKeyDown(wParam, true);
+				break;
+			case WM_SYSKEYUP:
+				window->OnKeyUp(wParam, true);
+				break;
+			case WM_SYSCHAR:
+				window->OnCharPrint(wParam, true);
+				break;
+			default:
+				return DefWindowProcA(hWnd, msg, wParam, lParam);
+			}
 		}
 
 		int Init()
@@ -41,6 +98,7 @@ namespace age
 				MessageBoxA(NULL, "CreateWindow() failed: Cannot create a window.", "Error", MB_OK);
 			}
 			this->shouldClose = false;
+			windowMap[(HWND)(this->window)] = this;
 		}
 
 		Window::~Window()
