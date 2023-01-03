@@ -13,6 +13,14 @@ namespace age
 		std::map<HWND, Window*> windowMap;
 		Window* current = NULL;
 
+		struct WinParams
+		{
+			DWORD styleEx;
+			DWORD style;
+			RECT rect;
+			bool maximized;
+		};
+
 		LRESULT AgeWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			Window* window = windowMap[hWnd];
@@ -123,10 +131,14 @@ namespace age
 
 			DescribePixelFormat((HDC)(this->dc), pf, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
 			this->rc = wglCreateContext((HDC)(this->dc));
+
 			this->shouldClose = false;
 			this->visible = false;
 			this->fullscreen = false;
+			this->savedParams = new WinParams();
+
 			windowMap[(HWND)(this->window)] = this;
+
 			this->OnMouseMove = NULL;
 			this->OnMouseScroll = NULL;
 			this->OnMouseButtonDown = NULL;
@@ -151,10 +163,34 @@ namespace age
 
 		void Window::SetFullscreen(bool fullscreen)
 		{
-			if (this->fullscreen != fullscreen)
+			if (this->fullscreen == fullscreen) return;
+			WinParams* saved = (WinParams*)(this->savedParams);
+			if (!(this->fullscreen))
 			{
-				this->fullscreen = fullscreen;
-				this->UpdateWindowParams();
+				saved->maximized = !!IsZoomed((HWND)(this->window));
+				if (saved) SendMessageA((HWND)(this->window), WM_SYSCOMMAND, SC_RESTORE, 0);
+				saved->style = GetWindowLongA((HWND)(this->window), GWL_STYLE);
+				saved->styleEx = GetWindowLongA((HWND)(this->window), GWL_EXSTYLE);
+				GetWindowRect((HWND)(this->window), &(saved->rect));
+			}
+			this->fullscreen = fullscreen;
+			if (this->fullscreen)
+			{
+				SetWindowLongA((HWND)(this->window), GWL_STYLE, saved->style & ~(WS_OVERLAPPEDWINDOW));
+				SetWindowLongA((HWND)(this->window), GWL_EXSTYLE, (saved->styleEx | WS_EX_TOPMOST) & ~(WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE));
+				MONITORINFO monitor_info;
+				monitor_info.cbSize = sizeof(monitor_info);
+				GetMonitorInfo(MonitorFromWindow((HWND)(this->window), MONITOR_DEFAULTTONEAREST), &monitor_info);
+				RECT wrect = monitor_info.rcMonitor;
+				SetWindowPos((HWND)(this->window), NULL, wrect.left, wrect.top, wrect.right - wrect.left, wrect.bottom - wrect.top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+			}
+			else
+			{
+				SetWindowLongA((HWND)(this->window), GWL_STYLE, saved->style);
+				SetWindowLongA((HWND)(this->window), GWL_EXSTYLE, saved->styleEx);
+				RECT wrect = saved->rect;
+				SetWindowPos((HWND)(this->window), NULL, wrect.left, wrect.top, wrect.right - wrect.left, wrect.bottom - wrect.top, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+				if (saved->maximized) SendMessage((HWND)(this->window), WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 			}
 		}
 
@@ -165,31 +201,15 @@ namespace age
 
 		void Window::SetVisible(bool visible)
 		{
-			if (this->visible != visible)
-			{
-				this->visible = visible;
-				this->UpdateWindowParams();
-			}
+			if (this->visible == visible) return;
+			this->visible = visible;
+			if (this->visible) ShowWindow((HWND)(this->window), SW_SHOW);
+			else ShowWindow((HWND)(this->window), SW_HIDE);
 		}
 
 		bool Window::IsVisible()
 		{
 			return this->visible;
-		}
-
-		void Window::UpdateWindowParams()
-		{
-			DWORD exStyle = 0L;
-			DWORD style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
-			if (this->fullscreen)
-			{
-				style = style | WS_POPUP;
-				exStyle = exStyle | WS_EX_TOPMOST;
-			}
-			else style = style | WS_OVERLAPPEDWINDOW;
-			if (this->visible) style = style | WS_VISIBLE;
-			SetWindowLongPtrA((HWND)(this->window), GWL_STYLE, style);
-			SetWindowLongPtrA((HWND)(this->window), GWL_EXSTYLE, exStyle);
 		}
 
 		void Window::HandleEvents()

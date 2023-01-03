@@ -11,11 +11,10 @@ namespace age
 		class AGE_API Window
 		{
 		private:
-			void *window, *dc, *rc;
+			void *window, *dc, *rc, *savedParams;
 			bool fullscreen;
 			bool visible;
 			bool shouldClose;
-			void UpdateWindowParams();
 		public:
 			Window(std::string name, int x, int y, int width, int height);
 			~Window();
