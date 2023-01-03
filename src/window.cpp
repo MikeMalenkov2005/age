@@ -20,52 +20,52 @@ namespace age
 			switch (msg)
 			{
 			case WM_MOUSEMOVE:
-				window->OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseMove != NULL) window->OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_MOUSEWHEEL:
-				window->OnMouseScroll(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), GET_WHEEL_DELTA_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseScroll != NULL) window->OnMouseScroll(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), GET_WHEEL_DELTA_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_LBUTTONDOWN:
-				window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 0, GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonDown != NULL) window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 0, GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_LBUTTONUP:
-				window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 0, GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonUp != NULL) window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 0, GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_RBUTTONDOWN:
-				window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 1, GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonDown != NULL) window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 1, GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_RBUTTONUP:
-				window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 1, GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonUp != NULL) window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 1, GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_MBUTTONDOWN:
-				window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2, GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonDown != NULL) window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2, GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_MBUTTONUP:
-				window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2, GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonUp != NULL) window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2, GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_XBUTTONDOWN:
-				window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2 + GET_XBUTTON_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonDown != NULL) window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2 + GET_XBUTTON_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_XBUTTONUP:
-				window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2 + GET_XBUTTON_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonUp != NULL) window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2 + GET_XBUTTON_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_KEYDOWN:
-				window->OnKeyDown(wParam, false);
+				if (window->OnKeyDown != NULL) window->OnKeyDown(wParam, false);
 				break;
 			case WM_KEYUP:
-				window->OnKeyUp(wParam, false);
+				if (window->OnKeyUp != NULL) window->OnKeyUp(wParam, false);
 				break;
 			case WM_CHAR:
-				window->OnCharPrint(wParam, false);
+				if (window->OnCharPrint != NULL) window->OnCharPrint(wParam, false);
 				break;
 			case WM_SYSKEYDOWN:
-				window->OnKeyDown(wParam, true);
+				if (window->OnKeyDown != NULL) window->OnKeyDown(wParam, true);
 				break;
 			case WM_SYSKEYUP:
-				window->OnKeyUp(wParam, true);
+				if (window->OnKeyUp != NULL) window->OnKeyUp(wParam, true);
 				break;
 			case WM_SYSCHAR:
-				window->OnCharPrint(wParam, true);
+				if (window->OnCharPrint != NULL) window->OnCharPrint(wParam, true);
 				break;
 			default:
 				return DefWindowProcA(hWnd, msg, wParam, lParam);
@@ -99,6 +99,13 @@ namespace age
 			}
 			this->shouldClose = false;
 			windowMap[(HWND)(this->window)] = this;
+			this->OnMouseMove = NULL;
+			this->OnMouseScroll = NULL;
+			this->OnMouseButtonDown = NULL;
+			this->OnMouseButtonUp = NULL;
+			this->OnKeyDown = NULL;
+			this->OnKeyUp = NULL;
+			this->OnCharPrint = NULL;
 		}
 
 		Window::~Window()
@@ -185,13 +192,5 @@ namespace age
 			}
 			return GLEW_OK;
 		}
-
-		void Window::OnMouseMove(int x, int y, int mode) {}
-		void Window::OnMouseScroll(int x, int y, int scroll, int mode) {}
-		void Window::OnMouseButtonDown(int x, int y, int button, int mode) {}
-		void Window::OnMouseButtonUp(int x, int y, int button, int mode) {}
-		void Window::OnKeyDown(int keyCode, bool alt) {}
-		void Window::OnKeyUp(int keyCode, bool alt) {}
-		void Window::OnCharPrint(int charCode, bool alt) {}
 	};
 };

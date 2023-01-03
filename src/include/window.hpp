@@ -26,13 +26,13 @@ namespace age
 			void HandleEvents();
 			bool ShouldClose();
 			GLenum MakeContextCurrent();
-			void OnMouseMove(int x, int y, int mode);
-			void OnMouseScroll(int x, int y, int scroll, int mode);
-			void OnMouseButtonDown(int x, int y, int button, int mode);
-			void OnMouseButtonUp(int x, int y, int button, int mode);
-			void OnKeyDown(int keyCode, bool alt);
-			void OnKeyUp(int keyCode, bool alt);
-			void OnCharPrint(int charCode, bool alt);
+			void (*OnMouseMove)(int x, int y, int mode);
+			void (*OnMouseScroll)(int x, int y, int scroll, int mode);
+			void (*OnMouseButtonDown)(int x, int y, int button, int mode);
+			void (*OnMouseButtonUp)(int x, int y, int button, int mode);
+			void (*OnKeyDown)(int keyCode, bool alt);
+			void (*OnKeyUp)(int keyCode, bool alt);
+			void (*OnCharPrint)(int charCode, bool alt);
 		};
 	}
 }
