@@ -185,5 +185,13 @@ namespace age
 			}
 			return GLEW_OK;
 		}
+
+		void Window::OnMouseMove(int x, int y, int mode) {}
+		void Window::OnMouseScroll(int x, int y, int scroll, int mode) {}
+		void Window::OnMouseButtonDown(int x, int y, int button, int mode) {}
+		void Window::OnMouseButtonUp(int x, int y, int button, int mode) {}
+		void Window::OnKeyDown(int keyCode, bool alt) {}
+		void Window::OnKeyUp(int keyCode, bool alt) {}
+		void Window::OnCharPrint(int charCode, bool alt) {}
 	};
 };
