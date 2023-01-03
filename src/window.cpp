@@ -97,7 +97,30 @@ namespace age
 			if (this->window == NULL) {
 				MessageBoxA(NULL, "CreateWindow() failed: Cannot create a window.", "Error", MB_OK);
 			}
+			this->dc = GetDC((HWND)(this->window));
+
+			PIXELFORMATDESCRIPTOR pfd = { 0 };
+			memset(&pfd, 0, sizeof(pfd));
+			pfd.nSize = sizeof(pfd);
+			pfd.nVersion = 1;
+			pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+			pfd.iPixelType = PFD_TYPE_RGBA;
+			pfd.cColorBits = 24;
+			pfd.cAlphaBits = 8;
+
+			int pf = ChoosePixelFormat((HDC)(this->dc), &pfd);
+			if (!pf) {
+				MessageBoxA(NULL, "ChoosePixelFormat() failed: Cannot find a suitable pixel format.", "Error", MB_OK);
+			}
+			if (!SetPixelFormat((HDC)(this->dc), pf, &pfd)) {
+				MessageBoxA(NULL, "SetPixelFormat() failed: Cannot set format specified.", "Error", MB_OK);
+			}
+
+			DescribePixelFormat((HDC)(this->dc), pf, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
+			this->rc = wglCreateContext((HDC)(this->dc));
 			this->shouldClose = false;
+			this->visible = false;
+			this->fullscreen = false;
 			windowMap[(HWND)(this->window)] = this;
 			this->OnMouseMove = NULL;
 			this->OnMouseScroll = NULL;
