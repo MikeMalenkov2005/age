@@ -4,9 +4,22 @@ AGE is an opensource game engine based on OpenGL rendering and custom physics
 
 ## Usage
 
-Initialize by creating an OpenGL context and calling:
+Initialize, create a window and make its context current:
 ```c++
-glewInit();
+age::wnd::Init();
+age::wnd::Window* window = new age::wnd::Window(title, x, y, width, height);
+window->MakeContextCurrent();
+```
+
+Update the window in while it is opened:
+```c++
+
+while (!(window->ShouldClose()))
+{
+    window->HandleEvents();
+    // Do some OpenGL stuff
+}
+
 ```
 
 Create and bind shaders:
@@ -26,17 +39,17 @@ shaders[1] = age::rp::Shader::CreateShader(GL_FRAGMENT_SHADER, src2);
 age::rp::Shader* program = new Shader(2, shaders);
 
 // bind program before using
-program->bind();
+program->Bind();
 
 // unbind program after using
-program->unbind();
+program->Unbind();
 
 // delete shader program when no longer needed
 delete program;
 
 // delete shaders when no longer needed
-glDeleteShader(shaders[0]);
-glDeleteShader(shaders[1]);
+age::rp::Shader::DeleteShader(shaders[0]);
+age::rp::Shader::DeleteShader(shaders[1]);
 
 ```
 
