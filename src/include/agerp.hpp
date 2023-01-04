@@ -32,6 +32,7 @@ namespace age
 			GLuint GetId();
 			BufSize GetSize();
 			GLenum GetType();
+			void SetData(int offset, size_t size, const void* data);
 		};
 
 		class AGE_API Mesh
@@ -62,6 +63,31 @@ namespace age
 			static GLuint CreateShader(GLenum type, std::string src);
 			static GLuint CreateShader(GLenum type, std::istream& input);
 			static void DeleteShader(GLuint detachedShader);
+		};
+
+		class AGE_API Texture
+		{
+		private:
+			GLuint id;
+			GLenum type, format, filter, wrapMode;
+			int width, height, depth, levels;
+		public:
+			Texture(int width, int levels, GLenum format, GLenum filter, GLenum wrapMode);
+			Texture(int width, int height, int levels, GLenum format, GLenum filter, GLenum wrapMode);
+			Texture(int width, int height, int depth, int levels, GLenum format, GLenum filter, GLenum wrapMode);
+			~Texture();
+			GLuint GetId();
+			GLenum GetType();
+			GLenum GetFormat();
+			GLenum GetFilter();
+			void SetFilter(GLenum filter);
+			GLenum GetWrapMode();
+			void SetWrapMode(GLenum filter);
+			int GetWidth();
+			int GetHeight();
+			int GetDepth();
+			void SetData(int level, int x, int y, int z, int width, int height, int depth, GLenum format, GLenum type, const void* data);
+			void GenerateMipmap();
 		};
 	}
 }
