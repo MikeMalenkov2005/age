@@ -8,6 +8,11 @@ namespace age
 	namespace wnd {
 		int AGE_API Init();
 
+		struct Rectangle
+		{
+			int x, y, width, height;
+		};
+
 		class AGE_API Window
 		{
 		private:
@@ -26,14 +31,16 @@ namespace age
 			void Close();
 			void OnClose();
 			bool ShouldClose();
+			Rectangle GetBounds();
+			void SetBounds(Rectangle bounds);
 			GLenum MakeContextCurrent();
-			void (*OnMouseMove)(int x, int y, int mode);
-			void (*OnMouseScroll)(int x, int y, int scroll, int mode);
-			void (*OnMouseButtonDown)(int x, int y, int button, int mode);
-			void (*OnMouseButtonUp)(int x, int y, int button, int mode);
-			void (*OnKeyDown)(int keyCode, bool alt);
-			void (*OnKeyUp)(int keyCode, bool alt);
-			void (*OnCharPrint)(int charCode, bool alt);
+			void (*OnMouseMove)(Window* window, int x, int y, int mode);
+			void (*OnMouseScroll)(Window* window, int x, int y, int scroll, int mode);
+			void (*OnMouseButtonDown)(Window* window, int x, int y, int button, int mode);
+			void (*OnMouseButtonUp)(Window* window, int x, int y, int button, int mode);
+			void (*OnKeyDown)(Window* window, int keyCode, bool alt);
+			void (*OnKeyUp)(Window* window, int keyCode, bool alt);
+			void (*OnCharPrint)(Window* window, int charCode, bool alt);
 		};
 	}
 }

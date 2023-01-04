@@ -28,52 +28,52 @@ namespace age
 			switch (msg)
 			{
 			case WM_MOUSEMOVE:
-				if (window->OnMouseMove != NULL) window->OnMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseMove != NULL) window->OnMouseMove(window, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_MOUSEWHEEL:
-				if (window->OnMouseScroll != NULL) window->OnMouseScroll(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), GET_WHEEL_DELTA_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseScroll != NULL) window->OnMouseScroll(window, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), GET_WHEEL_DELTA_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_LBUTTONDOWN:
-				if (window->OnMouseButtonDown != NULL) window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 0, GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonDown != NULL) window->OnMouseButtonDown(window, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 0, GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_LBUTTONUP:
-				if (window->OnMouseButtonUp != NULL) window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 0, GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonUp != NULL) window->OnMouseButtonUp(window, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 0, GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_RBUTTONDOWN:
-				if (window->OnMouseButtonDown != NULL) window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 1, GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonDown != NULL) window->OnMouseButtonDown(window, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 1, GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_RBUTTONUP:
-				if (window->OnMouseButtonUp != NULL) window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 1, GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonUp != NULL) window->OnMouseButtonUp(window, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 1, GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_MBUTTONDOWN:
-				if (window->OnMouseButtonDown != NULL) window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2, GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonDown != NULL) window->OnMouseButtonDown(window, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2, GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_MBUTTONUP:
-				if (window->OnMouseButtonUp != NULL) window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2, GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonUp != NULL) window->OnMouseButtonUp(window, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2, GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_XBUTTONDOWN:
-				if (window->OnMouseButtonDown != NULL) window->OnMouseButtonDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2 + GET_XBUTTON_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonDown != NULL) window->OnMouseButtonDown(window, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2 + GET_XBUTTON_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_XBUTTONUP:
-				if (window->OnMouseButtonUp != NULL) window->OnMouseButtonUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2 + GET_XBUTTON_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
+				if (window->OnMouseButtonUp != NULL) window->OnMouseButtonUp(window, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), 2 + GET_XBUTTON_WPARAM(wParam), GET_KEYSTATE_WPARAM(wParam));
 				break;
 			case WM_KEYDOWN:
-				if (window->OnKeyDown != NULL) window->OnKeyDown(wParam, false);
+				if (window->OnKeyDown != NULL) window->OnKeyDown(window, wParam, false);
 				break;
 			case WM_KEYUP:
-				if (window->OnKeyUp != NULL) window->OnKeyUp(wParam, false);
+				if (window->OnKeyUp != NULL) window->OnKeyUp(window, wParam, false);
 				break;
 			case WM_CHAR:
-				if (window->OnCharPrint != NULL) window->OnCharPrint(wParam, false);
+				if (window->OnCharPrint != NULL) window->OnCharPrint(window, wParam, false);
 				break;
 			case WM_SYSKEYDOWN:
-				if (window->OnKeyDown != NULL) window->OnKeyDown(wParam, true);
+				if (window->OnKeyDown != NULL) window->OnKeyDown(window, wParam, true);
 				break;
 			case WM_SYSKEYUP:
-				if (window->OnKeyUp != NULL) window->OnKeyUp(wParam, true);
+				if (window->OnKeyUp != NULL) window->OnKeyUp(window, wParam, true);
 				break;
 			case WM_SYSCHAR:
-				if (window->OnCharPrint != NULL) window->OnCharPrint(wParam, true);
+				if (window->OnCharPrint != NULL) window->OnCharPrint(window, wParam, true);
 				break;
 			case WM_QUIT:
 			case WM_DESTROY:
@@ -136,6 +136,13 @@ namespace age
 			this->visible = false;
 			this->fullscreen = false;
 			this->savedParams = new WinParams();
+
+			WinParams* saved = (WinParams*)(this->savedParams);
+			saved->maximized = !!IsZoomed((HWND)(this->window));
+			if (saved) SendMessageA((HWND)(this->window), WM_SYSCOMMAND, SC_RESTORE, 0);
+			saved->style = GetWindowLongA((HWND)(this->window), GWL_STYLE);
+			saved->styleEx = GetWindowLongA((HWND)(this->window), GWL_EXSTYLE);
+			GetWindowRect((HWND)(this->window), &(saved->rect));
 
 			windowMap[(HWND)(this->window)] = this;
 
@@ -240,6 +247,36 @@ namespace age
 		bool Window::ShouldClose()
 		{
 			return this->shouldClose;
+		}
+
+		Rectangle Window::GetBounds()
+		{
+			RECT rect = { 0 };
+			GetWindowRect((HWND)(this->window), &rect);
+			return { rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top };
+		}
+
+		void Window::SetBounds(Rectangle bounds)
+		{
+			WinParams* saved = (WinParams*)(this->savedParams);
+			if (!(this->fullscreen))
+			{
+				saved->maximized = !!IsZoomed((HWND)(this->window));
+				if (saved) SendMessageA((HWND)(this->window), WM_SYSCOMMAND, SC_RESTORE, 0);
+				saved->style = GetWindowLongA((HWND)(this->window), GWL_STYLE);
+				saved->styleEx = GetWindowLongA((HWND)(this->window), GWL_EXSTYLE);
+				GetWindowRect((HWND)(this->window), &(saved->rect));
+			}
+			saved->rect.left = bounds.x;
+			saved->rect.top = bounds.y;
+			saved->rect.right = bounds.x + bounds.width;
+			saved->rect.bottom = bounds.y + bounds.height;
+			if (!(this->fullscreen))
+			{
+				if (saved->maximized) SendMessageA((HWND)(this->window), WM_SYSCOMMAND, SC_RESTORE, 0);
+				SetWindowPos((HWND)(this->window), NULL, bounds.x, bounds.y, bounds.width, bounds.height, SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+			}
+			saved->maximized = false;
 		}
 
 		GLenum Window::MakeContextCurrent()
