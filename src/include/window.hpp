@@ -34,6 +34,7 @@ namespace age
 			Rectangle GetBounds();
 			void SetBounds(Rectangle bounds);
 			GLenum MakeContextCurrent();
+			bool SwapBuffers();
 			void (*OnMouseMove)(Window* window, int x, int y, int mode);
 			void (*OnMouseScroll)(Window* window, int x, int y, int scroll, int mode);
 			void (*OnMouseButtonDown)(Window* window, int x, int y, int button, int mode);

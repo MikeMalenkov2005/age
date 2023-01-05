@@ -21,6 +21,12 @@ namespace age
 			bool maximized;
 		};
 
+		bool WinSwapBuffers(HDC hdc)
+		{
+			WINBOOL ans = SwapBuffers(hdc);
+			return ans != 0;
+		}
+
 		LRESULT AgeWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{
 			Window* window = windowMap[hWnd];
@@ -288,6 +294,11 @@ namespace age
 				return glewInit();
 			}
 			return GLEW_OK;
+		}
+
+		bool Window::SwapBuffers()
+		{
+			return WinSwapBuffers((HDC)(this->dc));
 		}
 	};
 };
