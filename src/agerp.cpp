@@ -127,45 +127,37 @@ namespace age
 			glDeleteShader(detachedShader);
 		}
 
-		Texture::Texture(int width, int levels, GLenum format, GLenum filter, GLenum wrapMode)
+		Texture::Texture(GLenum type, int width, int height, int depth, int levels, GLenum format, GLenum filter, GLenum wrapMode)
 		{
-			this->type = GL_TEXTURE_1D;
-			this->width = width;
-			this->height = 1;
-			this->depth = 1;
-			this->levels = levels;
-			this->format = format;
-			glCreateTextures(GL_TEXTURE_1D, 1, &this->id);
-			glTextureStorage1D(this->id, levels, format, width);
-			this->SetWrapMode(wrapMode);
-			this->SetFilter(filter);
-		}
-		Texture::Texture(int width, int height, int levels, GLenum format, GLenum filter, GLenum wrapMode)
-		{
-			this->type = GL_TEXTURE_2D;
-			this->width = width;
-			this->height = height;
-			this->depth = 1;
-			this->levels = levels;
-			this->format = format;
-			glCreateTextures(GL_TEXTURE_2D, 1, &this->id);
-			glTextureStorage2D(this->id, levels, format, width, height);
-			this->SetWrapMode(wrapMode);
-			this->SetFilter(filter);
-		}
-		Texture::Texture(int width, int height, int depth, int levels, GLenum format, GLenum filter, GLenum wrapMode)
-		{
-			this->type = GL_TEXTURE_3D;
+			this->type = type;
 			this->width = width;
 			this->height = height;
 			this->depth = depth;
 			this->levels = levels;
 			this->format = format;
-			glCreateTextures(GL_TEXTURE_3D, 1, &this->id);
-			glTextureStorage3D(this->id, levels, format, width, height, depth);
+			glCreateTextures(type, 1, &this->id);
+			switch (type)
+			{
+			case GL_TEXTURE_1D:
+				glTextureStorage1D(this->id, levels, format, width);
+				break;
+			case GL_TEXTURE_CUBE_MAP:
+			case GL_TEXTURE_2D:
+				glTextureStorage2D(this->id, levels, format, width, height);
+				break;
+			case GL_TEXTURE_3D:
+				glTextureStorage3D(this->id, levels, format, width, height, depth);
+				break;
+			default:
+				break;
+			}
 			this->SetWrapMode(wrapMode);
 			this->SetFilter(filter);
 		}
+		Texture::Texture(int width, int levels, GLenum format, GLenum filter, GLenum wrapMode) : Texture(GL_TEXTURE_1D, width, 1, 1, levels, format, filter, wrapMode) {}
+		Texture::Texture(int width, int height, int levels, GLenum format, GLenum filter, GLenum wrapMode) : Texture(GL_TEXTURE_2D, width, height, 1, levels, format, filter, wrapMode) {}
+		Texture::Texture(int width, int height, int depth, int levels, GLenum format, GLenum filter, GLenum wrapMode) : Texture(GL_TEXTURE_3D, width, height, depth, levels, format, filter, wrapMode) {}
+		Texture* Texture::CubeMap(int width, int height, GLenum format, GLenum filter, GLenum wrapMode) { return new Texture(GL_TEXTURE_CUBE_MAP, width, height, 1, 1, format, filter, wrapMode); }
 		Texture::~Texture()
 		{
 			glDeleteTextures(1, &this->id);
@@ -225,12 +217,37 @@ namespace age
 			case GL_TEXTURE_2D:
 				glTextureSubImage2D(this->id, level, x, y, width, height, format, type, data);
 				break;
+			case GL_TEXTURE_CUBE_MAP:
 			case GL_TEXTURE_3D:
 				glTextureSubImage3D(this->id, level, x, y, z, width, height, depth, format, type, data);
 				break;
 			default:
 				break;
 			}
+		}
+		bool Texture::SetData1D(int level, int x, int width, GLenum format, GLenum type, const void* data)
+		{
+			if (this->type != GL_TEXTURE_1D) return false;
+			SetData(level, x, 0, 0, width, 1, 1, format, type, data);
+			return true;
+		}
+		bool Texture::SetData2D(int level, int x, int y, int width, int height, GLenum format, GLenum type, const void* data)
+		{
+			if (this->type != GL_TEXTURE_2D) return false;
+			SetData(level, x, y, 0, width, height, 1, format, type, data);
+			return true;
+		}
+		bool Texture::SetData3D(int level, int x, int y, int z, int width, int height, int depth, GLenum format, GLenum type, const void* data)
+		{
+			if (this->type != GL_TEXTURE_3D) return false;
+			SetData(level, x, y, z, width, height, depth, format, type, data);
+			return true;
+		}
+		bool Texture::SetDataCubeMap(int level, int x, int y, int face, int width, int height, GLenum format, GLenum type, const void* data)
+		{
+			if (this->type != GL_TEXTURE_CUBE_MAP) return false;
+			SetData(level, x, y, face, width, height, 1, format, type, data);
+			return true;
 		}
 		void Texture::GenerateMipmap()
 		{

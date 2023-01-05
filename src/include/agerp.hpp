@@ -72,9 +72,11 @@ namespace age
 			GLenum type, format, filter, wrapMode;
 			int width, height, depth, levels;
 		public:
+			Texture(GLenum type, int width, int height, int depth, int levels, GLenum format, GLenum filter, GLenum wrapMode);
 			Texture(int width, int levels, GLenum format, GLenum filter, GLenum wrapMode);
 			Texture(int width, int height, int levels, GLenum format, GLenum filter, GLenum wrapMode);
 			Texture(int width, int height, int depth, int levels, GLenum format, GLenum filter, GLenum wrapMode);
+			static Texture* CubeMap(int width, int height, GLenum format, GLenum filter, GLenum wrapMode);
 			~Texture();
 			GLuint GetId();
 			GLenum GetType();
@@ -87,6 +89,10 @@ namespace age
 			int GetHeight();
 			int GetDepth();
 			void SetData(int level, int x, int y, int z, int width, int height, int depth, GLenum format, GLenum type, const void* data);
+			bool SetData1D(int level, int x, int width, GLenum format, GLenum type, const void* data);
+			bool SetData2D(int level, int x, int y, int width, int height, GLenum format, GLenum type, const void* data);
+			bool SetData3D(int level, int x, int y, int z, int width, int height, int depth, GLenum format, GLenum type, const void* data);
+			bool SetDataCubeMap(int level, int x, int y, int face, int width, int height, GLenum format, GLenum type, const void* data);
 			void GenerateMipmap();
 			void Bind(int index);
 			void Unbind(int index);
