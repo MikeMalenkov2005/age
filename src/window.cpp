@@ -255,6 +255,13 @@ namespace age
 			return this->shouldClose;
 		}
 
+		Rectangle Window::GetInnerBounds()
+		{
+			RECT rect = { 0 };
+			GetClientRect((HWND)(this->window), &rect);
+			return { rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top };
+		}
+
 		Rectangle Window::GetBounds()
 		{
 			RECT rect = { 0 };

@@ -31,6 +31,7 @@ namespace age
 			void Close();
 			void OnClose();
 			bool ShouldClose();
+			Rectangle GetInnerBounds();
 			Rectangle GetBounds();
 			void SetBounds(Rectangle bounds);
 			GLenum MakeContextCurrent();

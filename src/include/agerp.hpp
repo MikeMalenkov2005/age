@@ -42,7 +42,7 @@ namespace age
 			GLuint ebo;
 			size_t count;
 		public:
-			Mesh(size_t vboCount, GLBuffer* vbos[], size_t indexCount, uint* indices);
+			Mesh(size_t vboCount, GLBuffer* vbos[], size_t indexCount, const uint* indices);
 			~Mesh();
 			void SetVBO(GLuint binding, GLBuffer* vbo);
 			void Draw();

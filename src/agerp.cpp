@@ -28,7 +28,7 @@ namespace age
 			glNamedBufferSubData(this->id, offset, size, data);
 		}
 
-		Mesh::Mesh(size_t vboCount, GLBuffer* vbos[], size_t indexCount, uint* indices)
+		Mesh::Mesh(size_t vboCount, GLBuffer* vbos[], size_t indexCount, const uint* indices)
 		{
 			glCreateBuffers(1, &this->ebo);
 			glNamedBufferData(this->ebo, indexCount * sizeof(uint), indices, GL_STATIC_DRAW);
