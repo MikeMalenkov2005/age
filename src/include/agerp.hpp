@@ -88,6 +88,10 @@ namespace age
 			int GetDepth();
 			void SetData(int level, int x, int y, int z, int width, int height, int depth, GLenum format, GLenum type, const void* data);
 			void GenerateMipmap();
+			void Bind(int index);
+			void Unbind(int index);
+			void BindImage(uint index, int level, GLboolean layered, int layer, GLenum access);
+			void UnbindImage(uint index, int level, GLboolean layered, int layer, GLenum access);
 		};
 	}
 }

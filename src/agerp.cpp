@@ -236,5 +236,23 @@ namespace age
 		{
 			glGenerateTextureMipmap(this->id);
 		}
+		void Texture::Bind(int index)
+		{
+			glActiveTexture(GL_TEXTURE0 + index);
+			glBindTexture(this->type, this->id);
+		}
+		void Texture::Unbind(int index)
+		{
+			glActiveTexture(GL_TEXTURE0 + index);
+			glBindTexture(this->type, 0);
+		}
+		void Texture::BindImage(uint index, int level, GLboolean layered, int layer, GLenum access)
+		{
+			glBindImageTexture(index, this->id, level, layered, layer, access, this->format);
+		}
+		void Texture::UnbindImage(uint index, int level, GLboolean layered, int layer, GLenum access)
+		{
+			glBindImageTexture(index, 0, level, layered, layer, access, this->format);
+		}
 	}
 }
