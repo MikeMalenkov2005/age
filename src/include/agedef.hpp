@@ -11,8 +11,6 @@
 #include <fstream>
 #include <string>
 
-#include <glm/glm.hpp>
-
 typedef unsigned int uint;
 
 #endif
